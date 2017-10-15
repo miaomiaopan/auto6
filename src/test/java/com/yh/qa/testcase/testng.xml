@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="mainFlow">
+	<test verbose="1" name="mainFlow">
+		<classes>
+		    <class name="com.yh.qa.testcase.Yh_1" />
+			<class name="com.yh.qa.testcase.Yh_18" />
+			<class name="com.yh.qa.testcase.Yh_19" />
+			<class name="com.yh.qa.testcase.Yh_21" />
+			<class name="com.yh.qa.testcase.Yh_22" />
+			<class name="com.yh.qa.testcase.Yh_23" />
+			<class name="com.yh.qa.testcase.Yh_24" />
+			<class name="com.yh.qa.testcase.Yh_25" />
+		</classes>
+	</test>
+</suite>

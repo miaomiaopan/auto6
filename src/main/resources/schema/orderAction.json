@@ -1,0 +1,27 @@
+{
+    "$schema" : "http://json-schema.org/draft-04/schema#",
+    "title" : "guanjia order confirm",
+    "description" : "create shenghuo order",
+    "type" : "object",
+    "properties":{
+      "message" : {
+          "description" : "",
+          "type" : "string"
+      },
+      "code" : {
+          "description" : "return interface code, 0",
+          "type" : "number"
+      },
+      "data" : {
+          "description" : "return interface code, 0",
+          "type" : "number"
+      },
+      "now": {
+      "default": 1504243145647,
+      "description": "An explanation about the purpose of this instance.",
+      "id": "/properties/now",
+      "title": "The now schema",
+      "type": "integer"
+     }
+    }
+}

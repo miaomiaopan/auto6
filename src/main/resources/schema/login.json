@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "code": {
+      "default": 0,
+      "description": "An explanation about the purpose of this instance.",
+      "id": "/properties/code",
+      "title": "The code schema",
+      "type": "integer"
+    },
+    "data": {
+      "id": "/properties/data",
+      "properties": {
+        "access_token": {
+          "default": "601933_924613B69E87B893D9CA0F0FB327C34383166E6E739F23BA03C110D1B108615DDD1FA78287742BD7",
+          "description": "An explanation about the purpose of this instance.",
+          "id": "/properties/data/properties/access_token",
+          "title": "The access_token schema",
+          "type": "string"
+        },
+        "expires_in": {
+          "default": "7200",
+          "description": "An explanation about the purpose of this instance.",
+          "id": "/properties/data/properties/expires_in",
+          "title": "The expires_in schema",
+          "type": "string"
+        },
+        "refresh_token": {
+          "default": "d7962146-acea-4fb9-ac42-1bfe17f87673",
+          "description": "An explanation about the purpose of this instance.",
+          "id": "/properties/data/properties/refresh_token",
+          "title": "The refresh_token schema",
+          "type": "string"
+        },
+        "success": {
+          "default": 1,
+          "description": "An explanation about the purpose of this instance.",
+          "id": "/properties/data/properties/success",
+          "title": "The success schema",
+          "type": "integer"
+        },
+        "uid": {
+          "default": "817753822093475194",
+          "description": "An explanation about the purpose of this instance.",
+          "id": "/properties/data/properties/uid",
+          "title": "The uid schema",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "message": {
+      "default": "OK",
+      "description": "An explanation about the purpose of this instance.",
+      "id": "/properties/message",
+      "title": "The message schema",
+      "type": "string"
+    },
+    "now": {
+      "default": 1504243145647,
+      "description": "An explanation about the purpose of this instance.",
+      "id": "/properties/now",
+      "title": "The now schema",
+      "type": "integer"
+    }
+  },
+  "type": "object"
+}
