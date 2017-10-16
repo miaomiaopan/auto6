@@ -4,34 +4,6 @@
 		<classes>
 			<class name="com.yh.qa.testcase.Yh_1" />
 			<class name="com.yh.qa.testcase.Yh_2" />
-			<class name="com.yh.qa.testcase.Yh_3" />
-			<class name="com.yh.qa.testcase.Yh_4" />
-			<class name="com.yh.qa.testcase.Yh_5" />
-			<class name="com.yh.qa.testcase.Yh_6" />
-			<class name="com.yh.qa.testcase.Yh_7" />
-			<class name="com.yh.qa.testcase.Yh_8" />
-			<class name="com.yh.qa.testcase.Yh_9" />
-			<class name="com.yh.qa.testcase.Yh_10" />
-			<class name="com.yh.qa.testcase.Yh_11" />
-			<class name="com.yh.qa.testcase.Yh_12" />
-			<class name="com.yh.qa.testcase.Yh_13" />
-			<class name="com.yh.qa.testcase.Yh_14" />
-			<class name="com.yh.qa.testcase.Yh_15" />
-			<class name="com.yh.qa.testcase.Yh_16" />
-			<class name="com.yh.qa.testcase.Yh_17" />
-			<class name="com.yh.qa.testcase.Yh_18" />
-			<class name="com.yh.qa.testcase.Yh_19" />
-			<class name="com.yh.qa.testcase.Yh_20" />
-			<class name="com.yh.qa.testcase.Yh_21" />
-			<class name="com.yh.qa.testcase.Yh_22" />
-			<class name="com.yh.qa.testcase.Yh_23" />
-			<class name="com.yh.qa.testcase.Yh_24" />
-			<class name="com.yh.qa.testcase.Yh_25" />
-			<class name="com.yh.qa.testcase.Yh_26" />
-			<class name="com.yh.qa.testcase.Yh_27" />
-			<class name="com.yh.qa.testcase.Yh_28" />
-			<class name="com.yh.qa.testcase.Yh_29" />
-			<class name="com.yh.qa.testcase.Yh_30" />
 		</classes>
 	</test>
 </suite>
