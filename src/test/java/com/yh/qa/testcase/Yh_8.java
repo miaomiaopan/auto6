@@ -82,6 +82,7 @@ public class Yh_8 extends BaseTestCase {
         String body = "";
 
         try{
+            testcase.setTestName("Bravo 订单登记缺货后拆单");
             //1. 调用永辉生活登录接口
 
             uri = "?platform=ios";

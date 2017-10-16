@@ -98,6 +98,7 @@ public class Yh_9 extends BaseTestCase {
         String body = "";
 
         try{
+            testcase.setTestName("Bravo 自提包裹履单（B2B2C)");
             //1. 调用永辉生活登录接口
 
             uri = "?platform=ios";
