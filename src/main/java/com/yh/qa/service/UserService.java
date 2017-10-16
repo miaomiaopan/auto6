@@ -13,7 +13,7 @@ public interface UserService {
 	// 调用asset/info获取个人中心信息
 	JsonPath info(String query, int code) throws Exception;
 
-	UserInfo getInfo(String query, int code) throws Exception;
+	UserInfo getInfo(String query, String uid,int code) throws Exception;
 	
 	//上传定位
 	JsonPath location(String query, int code) throws Exception;

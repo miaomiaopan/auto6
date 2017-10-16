@@ -1,9 +1,11 @@
 package com.yh.qa.testcase;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.yh.qa.util.CalculateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
@@ -133,8 +135,6 @@ public class Yh_18 extends BaseTestCase {
 					+ ",\"timeslots\":[{\"immediatedesc\":\"60分钟达\",\"slottype\":\"immediate\"}]},\"totalpayment\":0,\"uid\":\"836248696765411806\"}";
 			jsonPath = orderService.confirm(query, body, 0);
 			orderIds.add(jsonPath.getString("orderid"));
-			
-			Thread.sleep(10000);
 
 			// 重新登录永辉生活APP刷新用户信息
 			query = "?platform=ios";
@@ -144,8 +144,7 @@ public class Yh_18 extends BaseTestCase {
 
 			Assert.isTrue(userInfo.getBalance() + (price * quantity + 6) * 2 * 100 == balance, "下单支付后用户余额减少数额错误");
 			Assert.isTrue(userInfo.getNum() - 2 == num, "下单支付后订单总数没有加2");
-			System.out.println(userInfo.getToDelivery());
-//			Assert.isTrue(userInfo.getToDelivery() - 2 == toDelivery, "下单后待配送订单总数没有加2");
+			Assert.isTrue(userInfo.getToDelivery() - 2 == toDelivery, "下单后待配送订单总数没有加2");
 
 			// 使用拥有bravo拣货员角色的账号登录管家APP进行拣货
 			query = "?platform=android";
@@ -202,8 +201,6 @@ public class Yh_18 extends BaseTestCase {
 					+ "&timestamp=" + System.currentTimeMillis() + "&platform=ios&channel=qa3";
 			body = "{\"waveId\": \"" + mergedWaveId + "\"}";
 			jsonPath = orderService.completePack(query, body, 0);
-			
-			Thread.sleep(5000);
 
 			// 调用管家的订单详情接口获取订单状态
 			for (String orderId : orderIds) {
@@ -225,7 +222,7 @@ public class Yh_18 extends BaseTestCase {
 					+ System.currentTimeMillis() + "&longitude=" + lng + "&latitude=" + lat + "";
 			jsonPath = userService.location(query, 0);
 
-			Thread.sleep(60000 * 7);
+			Thread.sleep(60000 * 2);
 
 			// 根据订单号获取批次号
 			batchIds = orderDao.getBatchIdsByOrderIds(orderIds);
@@ -283,7 +280,8 @@ public class Yh_18 extends BaseTestCase {
 			goodsArr.add(new OrderDetail(quantity, price));
 			Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
 			System.out.println(tempCredit + "**" + credit);
-			Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+			Assert.isTrue(CalculateUtil.sub(userInfo.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfo.getCredit());
+
 
 			// 登出永辉生活app
 			query = "?platform=Android&access_token=" + accessTokenSH;

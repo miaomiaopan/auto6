@@ -7,6 +7,7 @@ import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.LoginService;
 import com.yh.qa.service.OrderService;
 import com.yh.qa.service.UserService;
+import com.yh.qa.util.ValidateUtil;
 import io.restassured.path.json.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -70,7 +71,7 @@ public class Yh_27 extends BaseTestCase{
 
             //获取用户信息，验证用户订单数，用户余额
             String query = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp=" + System.currentTimeMillis() + "&v=4.2.2.2&access_token=" + access_token;
-            UserInfo info = userService.getInfo(query, 0);
+            UserInfo info = userService.getInfo(query,uid, 0);
             Assert.isTrue(info.getBalance() + 1980 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToPickup() - 1 == toPick, "下单后配送订单没有加1");
@@ -84,27 +85,27 @@ public class Yh_27 extends BaseTestCase{
             JsonPath loginGJResult = loginService.loginGJ(loginGJQuery, loginGJBody, 0);
             String accessTokenGJ = loginGJResult.getString("token");
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.PENDING.getIndex(), "订单付款完成管家中订单状态不是待确认状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.PENDING,"下单后",orderService,orderId, accessTokenGJ,uid,null);
 
             // 获取待接单的波次号信息，最大等待1分钟
             String waveId = orderService.getDelayedWaveIdByOrderId(orderId,1);
 
-            //接单
+            //开始集波拣货
             String packQuery = "/" + waveId + "?" + "waveId=" + waveId + "&access_token=" + accessTokenGJ + "&timestamp="
                     + System.currentTimeMillis() + "&platform=ios&channel=qa3";
             String packBody = "{\"waveId\": \"" + waveId + "\"}";
             orderService.startPack(packQuery, packBody, 0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(), "下单完成后订单状态不是待确认状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"开始拣货后",orderService,orderId, accessTokenGJ,uid,null);
 
             //完成拣货
             orderService.completePack(packQuery, packBody, 0);
             Thread.sleep(5000);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.READY_TO_PICKUP.getIndex(), "拣货完成后订单状态不是等待提货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.READY_TO_PICKUP,"完成拣货后",orderService,orderId, accessTokenGJ,uid,null);
             Thread.sleep(20000);
 
-            // 使用拥有bravo自提员角色的账号登录管家APP进行拣货
+            // 使用拥有bravo自提员角色的账号登录管家APP进行操作
             String loginGJPickQuery = "?platform=android";
             String loginGJPickBody = "{\"pwd\": \"123456a\", \"username\": \"9485400\"}";
             JsonPath loginGJPickResult = loginService.loginGJ(loginGJPickQuery, loginGJPickBody, 0);
@@ -119,7 +120,7 @@ public class Yh_27 extends BaseTestCase{
             String pickBody = "{\"orderid\":\""+orderId+"\",\"items\":{\""+itmeId+"\":{\"id\":\""+productId+"\",\"num\":100}},\"comment\":\"不要了\"}";
             orderService.partialReturn(pickQuery,pickBody,0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJPick, uid, GJOrderStatus.REFUNDING.getIndex(), "拒收完成后订单状态不是退款审核中状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.REFUNDING,"自提员登记拒收后",orderService,orderId, accessTokenGJ,uid,null);
 
             //拣货员售后单，退款
             String serviceId = orderDao.getServiceOrderIdByOrderId(orderId);
@@ -127,7 +128,7 @@ public class Yh_27 extends BaseTestCase{
             String returnBody = "{\"serviceorderid\":"+serviceId+",\"memo\":\"\",\"action\":1}";
             orderService.action(returnQuery,returnBody,0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.ORDER_RETURNED.getIndex(), "拒收完成后订单状态不是订单退款或退货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.ORDER_RETURNED,"退款后",orderService,orderId, accessTokenGJ,uid,null);
 
             Thread.sleep(5000);
             // 重新登录永辉生活APP刷新用户信息

@@ -203,4 +203,10 @@ public class OrderServiceImpl extends HttpServiceImpl implements OrderService {
         Assert.isTrue(status == index, message);
     }
 
+	@Override
+	public JsonPath pickOrderComplete(String query, String body, int code) throws Exception {
+		ResultBean result = post(domainGuanJia + Path.PICKORDERCOMPLETE + query, body, "");
+		return ValidateUtil.validateCode(result, code);
+	}
+
 }

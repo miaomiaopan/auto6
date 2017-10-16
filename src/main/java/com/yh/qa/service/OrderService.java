@@ -78,4 +78,7 @@ public interface OrderService {
     // 调用管家的包裹详情接口获取包裹状态
 	void validatePackageStatusGJ(String packageCode, String accessTokenGJ, int code, int index, String message) throws Exception;
 
+	// 管家超级物种核销拣货单
+	JsonPath pickOrderComplete(String query, String body, int code) throws Exception;
+
 }

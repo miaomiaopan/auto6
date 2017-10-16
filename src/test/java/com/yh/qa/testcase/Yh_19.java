@@ -1,9 +1,11 @@
 package com.yh.qa.testcase;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.yh.qa.util.CalculateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
@@ -207,10 +209,6 @@ public class Yh_19 extends BaseTestCase {
 			if (batchIds.isEmpty()) {
 				throw new Exception("没有找到批次号，需要加长等候时间");
 			}
-			
-			//需要等候，因为批次的状态也许还是等待分配
-			//TODO 校验批次的状态
-			Thread.sleep(10000);
 
 			// 配送员1拒单
 			for (String batchId : batchIds) {
@@ -283,7 +281,8 @@ public class Yh_19 extends BaseTestCase {
 			goodsArr.add(new OrderDetail(quantity, price));
 			Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
 			System.out.println(tempCredit + "**" + credit);
-			Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+			Assert.isTrue(CalculateUtil.sub(userInfo.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfo.getCredit());
+
 
 			// 登出永辉生活app
 			query = "?platform=Android&access_token=" + accessTokenSH;

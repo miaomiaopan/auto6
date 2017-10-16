@@ -17,6 +17,9 @@ public interface KDSService {
     //完成加工单
     JsonPath finishProcessOrder(Map<String, String> queryPara,String body, int code) throws Exception;
 
+    //称重
+    public JsonPath weighing(Map<String, String> queryPara, String body, int code) throws Exception;
+
     //完成加工单
     JsonPath pickUpOrder(Map<String, String> queryPara,String body, int code) throws Exception;
 }

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "code": {
+      "default": 0,
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        "0"
+      ],
+      "id": "/properties/code",
+      "title": "The code schema.",
+      "type": "integer"
+    },
+    "data": {
+      "default": true,
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        "True"
+      ],
+      "id": "/properties/data",
+      "title": "The data schema.",
+      "type": "boolean"
+    },
+    "message": {
+      "default": "",
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        ""
+      ],
+      "id": "/properties/message",
+      "title": "The message schema.",
+      "type": "string"
+    },
+    "now": {
+      "default": 1507975236635,
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        "1507975236635"
+      ],
+      "id": "/properties/now",
+      "title": "The now schema.",
+      "type": "integer"
+    }
+  },
+  "type": "object"
+}

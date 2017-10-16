@@ -38,6 +38,12 @@ public class KDSServiceImpl extends HttpServiceImpl implements KDSService{
         return ValidateUtil.validateCode(result, code);
     }
 
+    //称重
+    public JsonPath weighing(Map<String, String> queryPara, String body, int code) throws Exception{
+        ResultBean result = post(domainKDS + Path.WEIGHING + generateKDSUrl(queryPara), body, Schema.KDS_OPERATOR_ORDER);
+        return ValidateUtil.validateCode(result, code);
+    }
+
     //完成加工单
     public JsonPath finishProcessOrder(Map<String, String> queryPara,String body, int code) throws Exception{
         ResultBean result = post(domainKDS + Path.FINISHPROCESSORDER + generateKDSUrl(queryPara), body, Schema.KDS_OPERATOR_ORDER);

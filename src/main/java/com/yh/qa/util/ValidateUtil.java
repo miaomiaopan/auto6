@@ -3,10 +3,14 @@ package com.yh.qa.util;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.yh.qa.entity.GJOrderStatus;
 import com.yh.qa.entity.OrderDetail;
 
+import com.yh.qa.service.OrderService;
 import io.restassured.path.json.JsonPath;
+import org.springframework.util.Assert;
 
 /**
  * @author panmiaomiao
@@ -55,6 +59,23 @@ public class ValidateUtil {
 		}
 		
 		return credit.doubleValue();
+	}
+
+	// 调用管家的订单详情接口获取订单状态
+	public static Map<String, String> validateGJOrderStatus(GJOrderStatus expectStatus, String message,OrderService orderService, String orderId, String accessTokenGJ, String uid, Map<String,String> map) throws Exception {
+		Thread.sleep(2000);
+		String query = "?platform=Android&orderid=" + orderId + "&access_token=" + accessTokenGJ + "&id=" + uid;
+		JsonPath jsonPath = orderService.detailGj(query, 0);
+		int status = jsonPath.getInt("status");
+		GJOrderStatus enumStatus = GJOrderStatus.getGJOrderStatusByCode(status);
+		Assert.isTrue(status == expectStatus.getIndex(), message+",期望订单("+orderId+")状态为"+expectStatus.getDescription()+"("+expectStatus.getIndex()+")"+", 实际为："+enumStatus.getDescription()+"("+enumStatus.getIndex()+")");
+
+		if(map!=null) {
+			for (String s : map.keySet()) {
+				map.put(s, jsonPath.getString(s));
+			}
+		}
+		return map;
 	}
 	
 }

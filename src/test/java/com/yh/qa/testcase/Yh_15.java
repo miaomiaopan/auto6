@@ -6,6 +6,7 @@ import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.LoginService;
 import com.yh.qa.service.OrderService;
 import com.yh.qa.service.UserService;
+import com.yh.qa.util.CalculateUtil;
 import com.yh.qa.util.DateUtil;
 import com.yh.qa.util.ValidateUtil;
 import io.restassured.path.json.JsonPath;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,15 +53,15 @@ public class Yh_15 extends BaseTestCase {
             //上海市光路1128号临附近-开鲁店-商品256216
             String orderQuery = "?channel=qa3&deviceid=867628020935276&platform=Android&timestamp="+System.currentTimeMillis()+"&v=4.2.2.1&access_token="
                     + access_token;
-            String orderBody = "{\"balancepayoption\":1,\"device_info\":\"867628020935276\",\"freedeliveryoption\":1,\"paypasswordtype\":0,\"pickself\":0,\"pointpayoption\":0,\"pricetotal\":0,\"products\":[{\"id\":\"256216\",\"isbulkitem\":0,\"num\":200,\"pattern\":\"t\"}],\"recvinfo\":{\"address\":{\"area\":\"工农三村\",\"city\":\"上海\",\"cityid\":\"1\",\"detail\":\"5号301\"},\"alias\":\"家\",\"foodsupport\":0,\"id\":\"32333\",\"isSearch\":false,\"isdefault\":1,\"itemType\":0,\"location\":{\"lat\":\"31.32927633609778\",\"lng\":\"121.54173259931338\"},\"name\":\"龚\",\"nextdaydeliver\":0,\"phone\":\"13621952292\",\"scope\":0},\"sellerid\":2,\"storeid\":\"9D52\",\"texpecttime\":{\"date\":"+ DateUtil.getTodyTimeInMillis()+",\"timeslots\":[{\"immediatedesc\":\"最快30分钟达\",\"slottype\":\"immediate\"}]},\"totalpayment\":0,\"uid\":\""+uid+"\"}";
+            String orderBody = "{\"balancepayoption\":1,\"device_info\":\"867628020935276\",\"freedeliveryoption\":1,\"paypasswordtype\":0,\"pickself\":0,\"pointpayoption\":0,\"pricetotal\":0,\"products\":[{\"id\":\"256216\",\"isbulkitem\":0,\"num\":200,\"pattern\":\"t\"}],\"recvinfo\":{\"address\":{\"area\":\"工农三村\",\"city\":\"上海\",\"cityid\":\"1\",\"detail\":\"5号301\"},\"alias\":\"家\",\"foodsupport\":0,\"id\":\"32333\",\"isSearch\":false,\"isdefault\":1,\"itemType\":0,\"location\":{\"lat\":\"31.32927633609778\",\"lng\":\"121.54173259931338\"},\"name\":\"龚\",\"nextdaydeliver\":0,\"phone\":\""+phoneNum+"\",\"scope\":0},\"sellerid\":2,\"storeid\":\"9D52\",\"texpecttime\":{\"date\":"+ DateUtil.getTodyTimeInMillis()+",\"timeslots\":[{\"immediatedesc\":\"最快30分钟达\",\"slottype\":\"immediate\"}]},\"totalpayment\":0,\"uid\":\""+uid+"\"}";
             JsonPath result = orderService.confirm(orderQuery, orderBody,0);
             // 获取订单号
             String orderId = result.getString("orderid");
 
             //获取用户信息， 验证用户订单数
             String query = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp="+System.currentTimeMillis()+"&v=4.2.2.2&access_token="+access_token;
-            UserInfo info =userService.getInfo(query, 0);
-            Assert.isTrue(info.getBalance() + 1940 == balance, "下单支付后用户余额减少数额错误");
+            UserInfo info =userService.getInfo(query,uid, 0);
+            Assert.isTrue(info.getBalance() + 1920 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToDelivery() - 1 == toDelivery, "下单后待自提订单总数没有加1");
 
@@ -70,7 +72,7 @@ public class Yh_15 extends BaseTestCase {
             JsonPath loginGJResult = loginService.loginGJ(loginGJQuery, loginGJBody, 0);
             String accessTokenGJ = loginGJResult.getString("token");
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.PENDING.getIndex(),"生活APP下当日达合伙人配送单余额支付后管家中查询订单状态不是待确认状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.PENDING,"生活APP下单完成后",orderService,orderId, accessTokenGJ,uid,null);
 
             // 开始拣货
             String pickQuery = "?platform=ios&access_token=" + accessTokenGJ+"&timestamp="+System.currentTimeMillis();;
@@ -78,7 +80,8 @@ public class Yh_15 extends BaseTestCase {
             orderService.orderAction(pickQuery, pickBody, 0);
 
             // 调用管家的订单详情接口获取订单状态
-            validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(),"管家中开始拣货后订单状态不是开始拣货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"管家APP开始拣货后",orderService,orderId, accessTokenGJ,uid,null);
+            //validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(),"管家中开始拣货后订单状态不是开始拣货状态");
 
             // 拣货完成
             String pickFinishQuery = "?platform=ios&access_token=" + accessTokenGJ+"&timestamp="+System.currentTimeMillis();;
@@ -93,29 +96,28 @@ public class Yh_15 extends BaseTestCase {
             String partnerToken = partnerResult.getString("token");
             Thread.sleep(2000);
             // 调用管家的订单详情接口获取订单状态
-            validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.WAITING_TAKE.getIndex(),"管家中分配派送后订单状态不是待接单状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.WAITING_TAKE,"管家APP拣货完成后",orderService,orderId, partnerToken,uid,null);
 
             // 合伙人接单
             partnerQuery = "?platform=ios&access_token=" + partnerToken+"&timestamp="+System.currentTimeMillis();;
             partnerBody = "{\"orderid\": \"" + orderId + "\", \"action\": \"1\"}";
             orderService.orderAction(partnerQuery, partnerBody, 0);
             // 调用管家的订单详情接口获取订单状态
-            validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.READY_TO_PICKUP.getIndex(),"管家中分配派送员完成后订单状态不是待提状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.READY_TO_PICKUP,"管家APP合伙人接单后",orderService,orderId, partnerToken,uid,null);
 
             // 合伙人提单
             partnerQuery = "?platform=ios&access_token=" + partnerToken+"&timestamp="+System.currentTimeMillis();;
             partnerBody = "{\"orderid\": \"" + orderId + "\", \"action\": \"2\"}";
             orderService.orderAction(partnerQuery, partnerBody, 0);
             // 调用管家的订单详情接口获取订单状态
-            validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.PICKUP.getIndex(),"管家派送员提单完成后订单状态不是待核销状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.PICKUP,"管家APP合伙人提单后",orderService,orderId, partnerToken,uid,null);
 
-            // 核销
+            // 合伙人核销
             partnerQuery = "?platform=ios&access_token=" + partnerToken+"&timestamp="+System.currentTimeMillis();;
             partnerBody = "{\"orderid\": \"" + orderId + "\", \"action\": \"3\"}";
             orderService.orderAction(partnerQuery, partnerBody, 0);
             // 调用管家的订单详情接口获取订单状态
-            validateOrderStatus(orderId,accessTokenGJ, uid, GJOrderStatus.COMPLETE.getIndex(),"管家派送员提单完成后订单状态不是核销状态");
-
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.COMPLETE,"管家APP合伙人核销后",orderService,orderId, partnerToken,uid,null);
 
             // 重新登录永辉生活APP刷新用户信息
             String queryNew = "?platform=ios";
@@ -126,9 +128,9 @@ public class Yh_15 extends BaseTestCase {
             // 积分校验
             Map<Double, Double> goodsArr = new HashMap<Double, Double>();
             // key为数量，value为价格
-            goodsArr.put(1d, 19.40);
+            goodsArr.put(1d, 19.2);
             Double tempCredit = ValidateUtil.calculateCredit(goodsArr);
-            Assert.isTrue(userInfoNew.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+            Assert.isTrue(CalculateUtil.sub(userInfoNew.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfoNew.getCredit());
 
         }catch(Exception e){
             testcase.setStatus("FAIL");

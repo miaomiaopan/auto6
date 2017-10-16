@@ -1,8 +1,10 @@
 package com.yh.qa.testcase;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yh.qa.util.CalculateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
@@ -187,7 +189,7 @@ public class Yh_1 extends BaseTestCase {
 			goodsArr.add(new OrderDetail(quantity, price));
 			Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
 			System.out.println(tempCredit+"**"+credit);
-			Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+			Assert.isTrue(CalculateUtil.sub(userInfo.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfo.getCredit());
 
 			// 登出永辉生活app
 			query = "?platform=Android&access_token=" + accessTokenSH;

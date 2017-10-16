@@ -8,6 +8,7 @@ import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.LoginService;
 import com.yh.qa.service.OrderService;
 import com.yh.qa.service.UserService;
+import com.yh.qa.util.CalculateUtil;
 import com.yh.qa.util.DateUtil;
 import com.yh.qa.util.RandomString;
 import com.yh.qa.util.ValidateUtil;
@@ -15,6 +16,8 @@ import io.restassured.path.json.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,14 +62,14 @@ public class Yh_5 extends BaseTestCase {
             String orderQuery = "?channel=qa3&deviceid=867628020935276&platform=Android&timestamp="+System.currentTimeMillis()+"&v=4.2.2.1&access_token="
                     + access_token;
             //String orderBody = "{\"balancepayoption\":1,\"device_info\":\"867628020935276\",\"freedeliveryoption\":1,\"paypasswordtype\":0,\"pickself\":0,\"pointpayoption\":0,\"pricetotal\":0,\"products\":[{\"id\":\"M-924260\",\"isbulkitem\":0,\"num\":100,\"pattern\":\"n\"}],\"recvinfo\":{\"address\":{\"area\":\"上海润欣科技有限公司\",\"city\":\"上海\",\"cityid\":\"1\",\"detail\":\"3楼\"},\"alias\":\"公司\",\"foodsupport\":0,\"id\":\"32321\",\"isSearch\":false,\"isdefault\":1,\"itemType\":0,\"location\":{\"lat\":\"31.17488955848173\",\"lng\":\"121.41398457273941\"},\"name\":\"龚建飞\",\"nextdaydeliver\":0,\"phone\":\"13621952291\",\"scope\":0},\"sellerid\":1,\"storeid\":\"9D13\",\"texpecttime\":{\"date\":\""+DateUtil.getTomorrowTimeInMillis()+"\",\"timeslots\":[{\"from\":\"09:00\",\"slottype\":\"expectTime\",\"to\":\"20:00\"}]},\"totalpayment\":0,\"uid\":\""+uid+"\"}";
-            String orderBody = "{\"balancepayoption\":1,\"device_info\":\"867628020935276\",\"freedeliveryoption\":1,\"paypasswordtype\":0,\"pickself\":1,\"pointpayoption\":0,\"pricetotal\":0,\"products\":[{\"id\":\"M-924260\",\"isbulkitem\":0,\"num\":100,\"pattern\":\"n\"}],\"recvinfo\":{\"address\":{},\"foodsupport\":0,\"isSearch\":false,\"isdefault\":0,\"itemType\":0,\"location\":{\"lat\":\"\",\"lng\":\"\"},\"name\":\"\",\"nextdaydeliver\":0,\"phone\":\"13621952291\",\"scope\":0},\"sellerid\":1,\"storeid\":\"9D31\",\"texpecttime\":{\"date\":"+ DateUtil.getTomorrowTimeInMillis()+",\"timeslots\":[{\"from\":\"09:00\",\"slottype\":\"expectTime\",\"to\":\"20:00\"}]},\"totalpayment\":0,\"uid\":\""+uid+"\"}";
+            String orderBody = "{\"balancepayoption\":1,\"device_info\":\"867628020935276\",\"freedeliveryoption\":1,\"paypasswordtype\":0,\"pickself\":1,\"pointpayoption\":0,\"pricetotal\":0,\"products\":[{\"id\":\"M-924260\",\"isbulkitem\":0,\"num\":100,\"pattern\":\"n\"}],\"recvinfo\":{\"address\":{},\"foodsupport\":0,\"isSearch\":false,\"isdefault\":0,\"itemType\":0,\"location\":{\"lat\":\"\",\"lng\":\"\"},\"name\":\""+phoneNum+"\",\"nextdaydeliver\":0,\"phone\":\""+phoneNum+"\",\"scope\":0},\"sellerid\":1,\"storeid\":\"9D31\",\"texpecttime\":{\"date\":"+ DateUtil.getTomorrowTimeInMillis()+",\"timeslots\":[{\"from\":\"09:00\",\"slottype\":\"expectTime\",\"to\":\"20:00\"}]},\"totalpayment\":0,\"uid\":\""+uid+"\"}";
             JsonPath result = orderService.confirm(orderQuery, orderBody,0);
             // 获取订单号
             String orderId = result.getString("orderid");
 
             //获取用户信息， 验证用户订单数
             String query = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp="+System.currentTimeMillis()+"&v=4.2.2.2&access_token="+access_token;
-            UserInfo info =userService.getInfo(query, 0);
+            UserInfo info =userService.getInfo(query,uid, 0);
             Assert.isTrue(info.getBalance() + 9900 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToPickup() - 1 == toPickup, "下单后待自提订单总数没有加1");
@@ -101,18 +104,20 @@ public class Yh_5 extends BaseTestCase {
             String signPackageBody = "{\"actions\":[{\"orderid\":\""+deliverCode+"\",\"packagecode\":\""+packageCode+"\",\"reason\":\"\",\"status\":1}]}";
             orderService.signPackage(signPackageQuery,signPackageBody,0);
             //签收包裹后，验证订单状态
-            Thread.sleep(500);
-            validateOrderStatus(orderId,access_token, GJOrderStatus.PICKUP.getIndex(),"订单验证后的状态不是已签收");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.PENDING,"收包裹后",orderService,orderId, GJ_token,uid,null);
+            //validateOrderStatus(orderId,access_token, GJOrderStatus.PICKUP.getIndex(),"订单验证后的状态不是已签收");
 
             //店长核销
             String packageActionQuery = "?access_token="+GJ_token+"&platform=android&timestamp="+System.currentTimeMillis()+"&channel=anything&v=2.4.10.0";
             String packageActionBody = "{\"code\":\""+packageCode+"\",\"action\":3}";
             orderService.packageAction(packageActionQuery,packageActionBody,0);
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.COMPLETE,"app核销后",orderService,orderId, GJ_token,uid,null);
+
 
             //核销后验证订单状态, 评论的订单验证
             validateOrderStatus(orderId,access_token, GJOrderStatus.COMPLETE.getIndex(),"订单核销后的状态不是已核销");
             String query_after_action = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp="+System.currentTimeMillis()+"&v=4.2.2.2&access_token="+access_token;
-            UserInfo info2 =userService.getInfo(query_after_action, 0);
+            UserInfo info2 =userService.getInfo(query_after_action,uid, 0);
             Assert.isTrue(info2.getToComment() - 1 == toComment, "核销后待评价订单总数没有加1");
 
             // 积分校验
@@ -120,8 +125,7 @@ public class Yh_5 extends BaseTestCase {
             //key为数量，value为价格
             goodsArr.put(1d,99.0);
             Double tempCredit = ValidateUtil.calculateCredit(goodsArr);
-            Assert.isTrue(info2.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
-
+            Assert.isTrue(CalculateUtil.sub(info2.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+info2.getCredit());
         }catch (Exception e){
             testcase.setStatus("FAIL");
             testcase.setDescription(e.getMessage());

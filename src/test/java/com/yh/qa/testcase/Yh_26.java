@@ -6,11 +6,14 @@ import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.LoginService;
 import com.yh.qa.service.OrderService;
 import com.yh.qa.service.UserService;
+import com.yh.qa.util.CalculateUtil;
 import com.yh.qa.util.ValidateUtil;
 import io.restassured.path.json.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
+
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +71,7 @@ public class Yh_26 extends BaseTestCase {
 
             //获取用户信息，验证用户订单数，用户余额
             String query = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp=" + System.currentTimeMillis() + "&v=4.2.2.2&access_token=" + access_token;
-            UserInfo info = userService.getInfo(query, 0);
+            UserInfo info = userService.getInfo(query,uid, 0);
             Assert.isTrue(info.getBalance() + 1980 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToPickup() - 1 == toPick, "下单后配送订单没有加1");
@@ -82,14 +85,14 @@ public class Yh_26 extends BaseTestCase {
             JsonPath loginGJResult = loginService.loginGJ(loginGJQuery, loginGJBody, 0);
             String accessTokenGJ = loginGJResult.getString("token");
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.PENDING.getIndex(), "订单付款完成管家中订单状态不是待确认状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.PENDING,"下单后",orderService,orderId, accessTokenGJ,uid,null);
 
             // 店长核销
             String actionQuery = "?platform=android&timestamp=1507866356230&channel=anything&v=2.4.10.0&access_token="+ accessTokenGJ;
             String actionBody = "{\"orderid\":\""+orderId+"\",\"action\":3}";
             orderService.orderAction(actionQuery,actionBody,0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.COMPLETE.getIndex(), "核销后管家中订单状态不是已核销状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.COMPLETE,"核销后",orderService,orderId, accessTokenGJ,uid,null);
 
             Thread.sleep(5000);
             // 重新登录永辉生活APP刷新用户信息
@@ -104,7 +107,11 @@ public class Yh_26 extends BaseTestCase {
             // key为数量，value为价格
             goodsArr.put(1d, 19.8);
             Double tempCredit = ValidateUtil.calculateCredit(goodsArr);
-            Assert.isTrue(userInfoNew.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+            System.out.println(userInfoNew.getCredit());
+            System.out.println(tempCredit);
+            System.out.println(credit);
+            System.out.println(CalculateUtil.sub(userInfoNew.getCredit(),tempCredit));
+            Assert.isTrue(CalculateUtil.sub(userInfoNew.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfoNew.getCredit());
 
         }catch (Exception e){
             testcase.setStatus("FAIL");

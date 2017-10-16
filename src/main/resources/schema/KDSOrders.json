@@ -1,0 +1,294 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "code": {
+      "default": 0,
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        "0"
+      ],
+      "id": "/properties/code",
+      "title": "The code schema.",
+      "type": "integer"
+    },
+    "data": {
+      "id": "/properties/data",
+      "properties": {
+        "batchNo": {
+          "default": "88ea8705-bd7d-4b22-bbb0-f2ecc633c0cc",
+          "description": "An explanation about the purpose of this instance.",
+          "examples": [
+            "88ea8705-bd7d-4b22-bbb0-f2ecc633c0cc"
+          ],
+          "id": "/properties/data/properties/batchNo",
+          "title": "The batchno schema.",
+          "type": "string"
+        },
+        "waitProcessList": {
+          "id": "/properties/data/properties/waitProcessList",
+          "items": {
+            "id": "/properties/data/properties/waitProcessList/items",
+            "properties": {
+              "completed": {
+                "default": false,
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "False"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/completed",
+                "title": "The completed schema.",
+                "type": "boolean"
+              },
+              "deliveryDeadlineAt": {
+                "default": "2017-10-14 16:00:00",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "2017-10-14 16:00:00"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/deliveryDeadlineAt",
+                "title": "The deliverydeadlineat schema.",
+                "type": "string"
+              },
+              "deliveryType": {
+                "default": "self-pick",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "self-pick"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/deliveryType",
+                "title": "The deliverytype schema.",
+                "type": "string"
+              },
+              "locked": {
+                "default": false,
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "False"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/locked",
+                "title": "The locked schema.",
+                "type": "boolean"
+              },
+              "mobile": {
+                "default": "17316312358",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "17316312358"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/mobile",
+                "title": "The mobile schema.",
+                "type": "string"
+              },
+              "orderAt": {
+                "default": "2017-10-14 16:00:35",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "2017-10-14 16:00:35"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/orderAt",
+                "title": "The orderat schema.",
+                "type": "string"
+              },
+              "orderChannelNo": {
+                "default": "\u8f89#3",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "\u8f89#3"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/orderChannelNo",
+                "title": "The orderchannelno schema.",
+                "type": "string"
+              },
+              "orderId": {
+                "default": 1202660210012020,
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "1202660210012020"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/orderId",
+                "title": "The orderid schema.",
+                "type": "integer"
+              },
+              "orderSubType": {
+                "default": "food",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "food"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/orderSubType",
+                "title": "The ordersubtype schema.",
+                "type": "string"
+              },
+              "payAt": {
+                "default": "2017-10-14 16:00:36",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "2017-10-14 16:00:36"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/payAt",
+                "title": "The payat schema.",
+                "type": "string"
+              },
+              "pickupCode": {
+                "default": "393974282660",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "393974282660"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/pickupCode",
+                "title": "The pickupcode schema.",
+                "type": "string"
+              },
+              "processStatus": {
+                "default": "pending",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "pending"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/processStatus",
+                "title": "The processstatus schema.",
+                "type": "string"
+              },
+              "shopId": {
+                "default": "9I07",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  "9I07"
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/shopId",
+                "title": "The shopid schema.",
+                "type": "string"
+              },
+              "tableNumber": {
+                "default": "",
+                "description": "An explanation about the purpose of this instance.",
+                "examples": [
+                  ""
+                ],
+                "id": "/properties/data/properties/waitProcessList/items/properties/tableNumber",
+                "title": "The tablenumber schema.",
+                "type": "string"
+              },
+              "waitProcessItemList": {
+                "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList",
+                "items": {
+                  "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items",
+                  "properties": {
+                    "goodsName": {
+                      "default": "\u8fdb\u53e3\u83f2\u529b\u725b\u6392\uff08\u542b\u52a0\u5de5\uff09",
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "\u8fdb\u53e3\u83f2\u529b\u725b\u6392\uff08\u542b\u52a0\u5de5\uff09"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/goodsName",
+                      "title": "The goodsname schema.",
+                      "type": "string"
+                    },
+                    "needProcess": {
+                      "default": true,
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "True"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/needProcess",
+                      "title": "The needprocess schema.",
+                      "type": "boolean"
+                    },
+                    "needWeigh": {
+                      "default": true,
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "True"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/needWeigh",
+                      "title": "The needweigh schema.",
+                      "type": "boolean"
+                    },
+                    "pickItemId": {
+                      "default": "24470",
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "24470"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/pickItemId",
+                      "title": "The pickitemid schema.",
+                      "type": "string"
+                    },
+                    "processMethod": {
+                      "default": "\u725b\u8089TB",
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "\u725b\u8089TB"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/processMethod",
+                      "title": "The processmethod schema.",
+                      "type": "string"
+                    },
+                    "qty": {
+                      "default": 1,
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "1"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/qty",
+                      "title": "The qty schema.",
+                      "type": "integer"
+                    },
+                    "skuCode": {
+                      "default": "898325",
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "898325"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/skuCode",
+                      "title": "The skucode schema.",
+                      "type": "string"
+                    },
+                    "specProp": {
+                      "default": "180.00",
+                      "description": "An explanation about the purpose of this instance.",
+                      "examples": [
+                        "180.00"
+                      ],
+                      "id": "/properties/data/properties/waitProcessList/items/properties/waitProcessItemList/items/properties/specProp",
+                      "title": "The specprop schema.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "message": {
+      "default": "",
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        ""
+      ],
+      "id": "/properties/message",
+      "title": "The message schema.",
+      "type": "string"
+    },
+    "now": {
+      "default": 1507971309659,
+      "description": "An explanation about the purpose of this instance.",
+      "examples": [
+        "1507971309659"
+      ],
+      "id": "/properties/now",
+      "title": "The now schema.",
+      "type": "integer"
+    }
+  },
+  "type": "object"
+}

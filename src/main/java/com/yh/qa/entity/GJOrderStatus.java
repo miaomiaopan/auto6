@@ -1,5 +1,7 @@
 package com.yh.qa.entity;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author panmiaomiao
  *
@@ -44,6 +46,15 @@ public enum GJOrderStatus {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public static GJOrderStatus getGJOrderStatusByCode(int key){
+		for(GJOrderStatus s: GJOrderStatus.values()){
+			if(s.getIndex() == key){
+				return s;
+			}
+		}
+		return null;
 	}
 
 }

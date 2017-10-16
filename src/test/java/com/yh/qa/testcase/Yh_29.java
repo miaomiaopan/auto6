@@ -80,7 +80,7 @@ public class Yh_29 extends BaseTestCase {
 
             //获取用户信息，验证用户订单数，用户余额，待自提订单
             String userInfoQuery = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp=" + System.currentTimeMillis() + "&v=4.2.2.2&access_token=" + loginTokenSH;
-            UserInfo info = userService.getInfo(userInfoQuery, 0);
+            UserInfo info = userService.getInfo(userInfoQuery, uid,0);
             Assert.isTrue(info.getBalance() + 1990 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToDelivery() - 1 == toDelivery, "下单后待配送订单总数没有加1");

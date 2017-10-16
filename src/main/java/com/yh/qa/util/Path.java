@@ -14,7 +14,7 @@ public class Path {
 	public static String SH_ORDER_LIST = "/api/order/list";
 
 	// 生活APP获取订单详情
-	public static String SH_ORDER_DETAIL = "";
+	public static String SH_ORDER_DETAIL = "/api/order/detail";
 
 	// 管家APP获取订单详情
 	public static String GJ_ORDER_DETAIL = "/orderdetail";
@@ -100,7 +100,13 @@ public class Path {
 	//KDS 完成加工
 	public static String FINISHPROCESSORDER = "/kds/finishProcess";
 
+	//KDS 确定批次
+	public static String WEIGHING = "/kds/confirmWeightG";
+
 	//KDS 自提
 	public static String SELFPICK = "/kds/selfPick";
+
+	// 管家核销拣货单
+	public static String PICKORDERCOMPLETE = "/order/pickorder/complete";
 
 }

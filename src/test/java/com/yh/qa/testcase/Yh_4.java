@@ -9,6 +9,7 @@ import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.LoginService;
 import com.yh.qa.service.OrderService;
 import com.yh.qa.service.UserService;
+import com.yh.qa.util.CalculateUtil;
 import com.yh.qa.util.RandomString;
 import com.yh.qa.util.ShopAccount;
 import com.yh.qa.util.ValidateUtil;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +85,7 @@ public class Yh_4 extends BaseTestCase {
 
             //获取用户信息，验证用户订单数，用户余额，待自提订单
             String query = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp=" + System.currentTimeMillis() + "&v=4.2.2.2&access_token=" + access_token;
-            UserInfo info = userService.getInfo(query, 0);
+            UserInfo info = userService.getInfo(query, uid,0);
             Assert.isTrue(info.getBalance() + 10450 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 2 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToDelivery() - 2 == toDelivery, "下单后待自提订单总数没有加1");
@@ -217,8 +219,7 @@ public class Yh_4 extends BaseTestCase {
             // key为数量，value为价格
             goodsArr.put(1d, 104.5);
             Double tempCredit = ValidateUtil.calculateCredit(goodsArr);
-            Assert.isTrue(userInfoNew.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
-
+            Assert.isTrue(CalculateUtil.sub(userInfoNew.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfoNew.getCredit());
         } catch (Exception e) {
             testcase.setStatus("FAIL");
             testcase.setDescription(e.getMessage());

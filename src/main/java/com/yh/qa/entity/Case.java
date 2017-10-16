@@ -21,13 +21,13 @@ public class Case {
     @Column(name="batch_no")
     private String batchNo;
 
-    @Column(name="project_name", length=1024)
+    @Column(name="project_name")
     private String projectName;
 
     @Column(name="module_name")
     private String moduleName;
 
-    @Column(name="test_name")
+    @Column(name="test_name", length=2048)
     private String testName;
 
     @Column(name="begin_time")
@@ -42,7 +42,7 @@ public class Case {
     @Column(name="status")
     private String status;
 
-    @Column(name="description")
+    @Column(name="description", length=2048)
     private String description;
 
     // 历史平均时间

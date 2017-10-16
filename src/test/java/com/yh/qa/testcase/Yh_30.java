@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Yh_30 extends BaseTestCase {
     @Autowired
@@ -43,8 +41,6 @@ public class Yh_30 extends BaseTestCase {
         Double credit;
         // 订单总数
         int num;
-        // 待评价订单数量
-        int toComment;
         // 待配送订单数量
         int toPickup;
         // 订单状态
@@ -64,7 +60,6 @@ public class Yh_30 extends BaseTestCase {
             credit = userInfo.getCredit();
             System.out.println("前面的" + credit);
             num = userInfo.getNum();
-            toComment = userInfo.getToComment();
             toPickup = userInfo.getToPickup();
             uid = userInfo.getUId();
 
@@ -88,6 +83,7 @@ public class Yh_30 extends BaseTestCase {
             Assert.isTrue(userInfo.getToPickup() - 1 == toPickup, "下单后待配送订单总数没有加1");
 
             //KDS 获取订单列表
+            TimeUnit.SECONDS.sleep(10);
             Map<String, String> queryPara = new HashMap<String, String>();
             queryPara.put("shopId","9I07");
             queryPara.put("stallId","beef");
@@ -97,7 +93,13 @@ public class Yh_30 extends BaseTestCase {
             String pickupCode = jsonPath.getString("waitProcessList.pickupCode");
             List<String> orders = jsonPath.getList("waitProcessList.orderId");
             List<String> pickItemIds = jsonPath.getList("waitProcessList.waitProcessItemList.pickItemId");
-            Assert.isTrue(orders.contains(orderId),"未找到需要加工的订单");
+            boolean checkOrderResult=false;
+            for(Iterator iter = orders.iterator(); iter.hasNext();){
+                if(iter.next().toString().equals(orderId)){
+                    checkOrderResult = true;
+                }
+            }
+            Assert.isTrue(checkOrderResult,"未找到需要加工的订单");
 
             //KDS 确认加工列表
             queryPara.clear();
@@ -107,15 +109,20 @@ public class Yh_30 extends BaseTestCase {
             jsonPath = kdsService.confirmOrder(queryPara,"",0);
 
             //KDS 开始、完成加工菜品, 用户自提
-            for(String pickItemId:pickItemIds){
+            for(Iterator iter = pickItemIds.iterator(); iter.hasNext();){
+                String pickItemIdList = iter.next().toString();
+                String pickItemId = pickItemIdList.substring(1,pickItemIdList.length()-1);
                 queryPara.clear();
                 queryPara.put("shopId","9I07");
                 queryPara.put("appId","abc");
                 queryPara.put("stallId","beef");
                 queryPara.put("pickItemId",pickItemId);
+                queryPara.put("weightG","500");
+                jsonPath = kdsService.weighing(queryPara,"",0);
+                queryPara.remove("weightG");
                 jsonPath = kdsService.beginProcessOrder(queryPara,"",0);
                 jsonPath = kdsService.finishProcessOrder(queryPara,"",0);
-                queryPara.put("pickupCode",pickupCode);
+                queryPara.put("pickupCode",pickupCode.substring(1,pickupCode.length()-1));
                 jsonPath = kdsService.pickUpOrder(queryPara,"",0);
             }
 
@@ -127,14 +134,13 @@ public class Yh_30 extends BaseTestCase {
             userInfo = loginService.loginSHAndGetUserInfo(query, body, 0);
             accessTokenSH = userInfo.getAccess_token();
 
-            Assert.isTrue(userInfo.getToComment() - 1 == toComment, "核销后待评价订单总数没有加1");
-
             // 积分校验
-            List<OrderDetail> goodsArr = new ArrayList<OrderDetail>();
-            goodsArr.add(new OrderDetail(1d, 87.22d));
-            Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
-            System.out.println(tempCredit + "**" + credit);
-            Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+            //TODO 待确认
+            //List<OrderDetail> goodsArr = new ArrayList<OrderDetail>();
+            //goodsArr.add(new OrderDetail(1d, 87.22d));
+            //Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
+            //System.out.println(tempCredit + "**" + credit);
+            //Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
 
             // 登出永辉生活app
             query = "?platform=Android&access_token=" + accessTokenSH;

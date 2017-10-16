@@ -11,6 +11,7 @@ import com.yh.qa.repository.CaseRepository;
 import com.yh.qa.service.LoginService;
 import com.yh.qa.service.OrderService;
 import com.yh.qa.service.UserService;
+import com.yh.qa.util.CalculateUtil;
 import com.yh.qa.util.RandomString;
 import com.yh.qa.util.ResultBean;
 import com.yh.qa.util.ValidateUtil;
@@ -30,6 +31,7 @@ import org.testng.annotations.Test;
 
 import javax.validation.constraints.Null;
 import javax.xml.crypto.Data;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -220,8 +222,7 @@ public class Yh_10 extends BaseTestCase {
             // key为数量，value为价格
             goodsArr.put(1d, 5.50);
             Double tempCredit = ValidateUtil.calculateCredit(goodsArr);
-            Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
-
+            Assert.isTrue(CalculateUtil.sub(userInfo.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfo.getCredit());
             // 登出永辉生活app
             uri = "?platform=Android&access_token=" + accessTokenSH;
             jsonPath = loginService.loginOutSH(uri, 0);

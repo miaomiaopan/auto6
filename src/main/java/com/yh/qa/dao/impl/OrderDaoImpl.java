@@ -151,4 +151,10 @@ public class OrderDaoImpl implements OrderDao {
 		return jdbcTemplatePickListDb.queryForObject(sql,new Object[]{orderId},String.class);
 	}
 
+	@Override
+	public String getPickOrderIdByOrderId(String orderId) {
+		String sql = "select id from t_trade_picklist where order_id=" + orderId + " and pick_type='pick'";
+		return jdbcTemplatePickListDb.queryForObject(sql, String.class);
+	}
+
 }

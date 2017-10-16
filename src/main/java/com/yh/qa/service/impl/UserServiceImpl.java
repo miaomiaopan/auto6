@@ -1,5 +1,6 @@
 package com.yh.qa.service.impl;
 
+import com.yh.qa.dao.UserDao;
 import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.UserService;
 import com.yh.qa.util.ResultBean;
@@ -9,6 +10,7 @@ import io.restassured.path.json.JsonPath;
 
 import com.yh.qa.util.Path;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,9 @@ public class UserServiceImpl extends HttpServiceImpl implements UserService {
 	@Value("${domain-guanjia}")
 	private String domainGuanJia;
 
+	@Autowired
+	private UserDao userDao;
+
 	@Override
 	public JsonPath info(String query, int code) throws Exception {
 		ResultBean result = get(domainShenghuo + Path.SH_INFO + query, "");
@@ -27,12 +32,12 @@ public class UserServiceImpl extends HttpServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfo getInfo(String query, int code) throws Exception {
+	public UserInfo getInfo(String query, String uid,int code) throws Exception {
 		JsonPath jsonPath = info(query, code);
 		UserInfo userInfo = new UserInfo();
 		userInfo.setBalance(jsonPath.getInt("balance"));
 		// 界面上返回的积分数据是进行取整的，不准确，所以修改为从数据库中直接获取精确的积分值
-		userInfo.setCredit(jsonPath.getDouble("credit"));
+		userInfo.setCredit(userDao.getCreditByUid(uid));
 		userInfo.setCurretCouponNum(jsonPath.getInt("coupon"));
 		userInfo.setMobile(jsonPath.getString("mobile"));
 		userInfo.setToComment(jsonPath.getInt("toComment"));

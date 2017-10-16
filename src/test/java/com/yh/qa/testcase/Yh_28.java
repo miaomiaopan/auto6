@@ -74,7 +74,7 @@ public class Yh_28 extends BaseTestCase{
 
             //获取用户信息，验证用户订单数，用户余额
             String query = "?channel=qa3&deviceid=864854034674759&platform=Android&timestamp=" + System.currentTimeMillis() + "&v=4.2.2.2&access_token=" + access_token;
-            UserInfo info = userService.getInfo(query, 0);
+            UserInfo info = userService.getInfo(query,uid, 0);
             Assert.isTrue(info.getBalance() + 1980 == balance, "下单支付后用户余额减少数额错误");
             Assert.isTrue(info.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(info.getToPickup() - 1 == toPick, "下单后配送订单没有加1");
@@ -88,18 +88,18 @@ public class Yh_28 extends BaseTestCase{
             JsonPath loginGJResult = loginService.loginGJ(loginGJQuery, loginGJBody, 0);
             String accessTokenGJ = loginGJResult.getString("token");
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.PENDING.getIndex(), "订单付款完成管家中订单状态不是待确认状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.PENDING,"下单后",orderService,orderId, accessTokenGJ,uid,null);
 
             // 获取待接单的波次号信息，最大等待1分钟
             String waveId = orderService.getDelayedWaveIdByOrderId(orderId,1);
 
-            //接单
+            //拣货
             String packQuery = "/" + waveId + "?" + "waveId=" + waveId + "&access_token=" + accessTokenGJ + "&timestamp="
                     + System.currentTimeMillis() + "&platform=ios&channel=qa3";
             String packBody = "{\"waveId\": \"" + waveId + "\"}";
             orderService.startPack(packQuery, packBody, 0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(), "接单完成后订单状态不是开始拣货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"开始拣货后",orderService,orderId, accessTokenGJ,uid,null);
 
             //标记整单缺货
             packQuery = "?access_token=" + accessTokenGJ + "&timestamp=" + System.currentTimeMillis()
@@ -109,7 +109,7 @@ public class Yh_28 extends BaseTestCase{
                     + "\",\"stockleft\":0,\"skucode\":\"" + productId + "\"}]}";
             orderService.registerLackSku(packQuery, packBody, 0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(), "接单完成后订单状态不是开始拣货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"标记缺货后",orderService,orderId, accessTokenGJ,uid,null);
 
             //完成拣货
             packQuery = "/" + waveId + "?" + "waveId=" + waveId + "&access_token=" + accessTokenGJ + "&timestamp="
@@ -118,7 +118,8 @@ public class Yh_28 extends BaseTestCase{
             orderService.completePack(packQuery, packBody, 0);
             Thread.sleep(5000);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.REFUNDING.getIndex(), "拣货完成后订单状态不是退款审核中状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.REFUNDING,"标记缺货完成拣货后",orderService,orderId, accessTokenGJ,uid,null);
+
             Thread.sleep(10000);
 
             //拣货员驳回
@@ -127,7 +128,7 @@ public class Yh_28 extends BaseTestCase{
             packBody = "{\"serviceorderid\":"+serviceId+",\"memo\":\"\",\"action\":2}";
             orderService.action(packQuery,packBody,0);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(), "驳回后订单状态不是开始拣货状态");
+            //ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"拣货员驳回后",orderService,orderId, accessTokenGJ,uid,null);
 
             // 使用店长9485角色的账号登录管家APP
             loginGJQuery = "?platform=android";
@@ -135,14 +136,14 @@ public class Yh_28 extends BaseTestCase{
             loginGJResult = loginService.loginGJ(loginGJQuery, loginGJBody, 0);
             accessTokenGJ = loginGJResult.getString("token");
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(), "驳回后订单状态不是开始拣货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"拣货员驳回后",orderService,orderId, accessTokenGJ,uid,null);
 
             // 店长核销
             String actionQuery = "?platform=android&timestamp=1507866356230&channel=anything&v=2.4.10.0&access_token="+ accessTokenGJ;
             String actionBody = "{\"orderid\":\""+orderId+"\",\"action\":3}";
             orderService.orderAction(actionQuery,actionBody,61003);
             //获取订单信息，验证订单状态
-            validateOrderStatus(orderId, accessTokenGJ, uid, GJOrderStatus.START_PACK.getIndex(), "驳回后订单状态不是开始拣货状态");
+            ValidateUtil.validateGJOrderStatus(GJOrderStatus.START_PACK,"店长核销不成功后",orderService,orderId, accessTokenGJ,uid,null);
 
 
         }catch(Exception e){
