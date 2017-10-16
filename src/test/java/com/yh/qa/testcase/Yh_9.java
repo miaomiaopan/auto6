@@ -192,7 +192,7 @@ public class Yh_9 extends BaseTestCase {
             uri = "?platform=Android&access_token=" + accessTokenSH;
             jsonPath = loginService.loginOutSH(uri, 0);
         }catch (Exception e){
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         }

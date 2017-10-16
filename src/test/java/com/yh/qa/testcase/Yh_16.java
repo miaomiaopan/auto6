@@ -156,7 +156,7 @@ public class Yh_16 extends BaseTestCase {
             System.out.println((userInfoNew.getCredit() - tempCredit) == credit);
             Assert.isTrue(CalculateUtil.sub(userInfoNew.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+userInfoNew.getCredit());
         }catch(Exception e){
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         }

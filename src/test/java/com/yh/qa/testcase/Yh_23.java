@@ -288,7 +288,7 @@ public class Yh_23 extends BaseTestCase {
 			query = "?platform=Android&access_token=" + accessTokenSH;
 			jsonPath = loginService.loginOutSH(query, 0);
 		} catch (Exception e) {
-			testcase.setStatus("FAIL");
+			testcase.setStatus("FAILURE");
 			testcase.setDescription(e.getMessage());
 			throw e;
 		} finally {

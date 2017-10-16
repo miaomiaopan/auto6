@@ -127,7 +127,7 @@ public class Yh_5 extends BaseTestCase {
             Double tempCredit = ValidateUtil.calculateCredit(goodsArr);
             Assert.isTrue(CalculateUtil.sub(info2.getCredit(),tempCredit) == new BigDecimal(credit).doubleValue(), "核销后用户积分增加不正确，原来"+credit+",增加"+tempCredit+",现在"+info2.getCredit());
         }catch (Exception e){
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         }

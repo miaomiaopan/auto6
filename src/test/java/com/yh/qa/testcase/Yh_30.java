@@ -2,6 +2,7 @@ package com.yh.qa.testcase;
 
 import com.yh.qa.basecase.BaseTestCase;
 import com.yh.qa.entity.OrderDetail;
+import com.yh.qa.entity.SHOrderStatus;
 import com.yh.qa.entity.UserInfo;
 import com.yh.qa.service.KDSService;
 import com.yh.qa.service.LoginService;
@@ -82,31 +83,47 @@ public class Yh_30 extends BaseTestCase {
             Assert.isTrue(userInfo.getNum() - 1 == num, "下单支付后订单总数没有加1");
             Assert.isTrue(userInfo.getToPickup() - 1 == toPickup, "下单后待配送订单总数没有加1");
 
-            //KDS 获取订单列表
-            TimeUnit.SECONDS.sleep(10);
+            //KDS 获取、确认订单列表
             Map<String, String> queryPara = new HashMap<String, String>();
-            queryPara.put("shopId","9I07");
-            queryPara.put("stallId","beef");
-            queryPara.put("appId","abc");
-            jsonPath = kdsService.getProcessOrderList(queryPara,0);
-            String batchNo = jsonPath.getString("batchNo");
-            String pickupCode = jsonPath.getString("waitProcessList.pickupCode");
-            List<String> orders = jsonPath.getList("waitProcessList.orderId");
-            List<String> pickItemIds = jsonPath.getList("waitProcessList.waitProcessItemList.pickItemId");
+            String batchNo = "";
+            String pickupCode = "";
+            List<String> orders = new ArrayList<String>();
+            List<String> pickItemIds = new ArrayList<String>();
             boolean checkOrderResult=false;
-            for(Iterator iter = orders.iterator(); iter.hasNext();){
-                if(iter.next().toString().equals(orderId)){
-                    checkOrderResult = true;
+
+            while (!checkOrderResult){
+                TimeUnit.SECONDS.sleep(10);
+
+                queryPara.put("shopId","9I07");
+                queryPara.put("stallId","beef");
+                queryPara.put("appId","abc");
+                //KDS 获取订单列表
+                jsonPath = kdsService.getProcessOrderList(queryPara,0);
+                batchNo = jsonPath.getString("batchNo");
+                pickupCode = jsonPath.getString("waitProcessList.pickupCode");
+                orders = jsonPath.getList("waitProcessList.orderId");
+                pickItemIds = jsonPath.getList("waitProcessList.waitProcessItemList.pickItemId");
+                for(Iterator iter = orders.iterator(); iter.hasNext();){
+                    if(iter.next().toString().equals(orderId)){
+                        checkOrderResult = true;
+                        //KDS 确认加工列表
+                        queryPara.clear();
+                        queryPara.put("shopId","9I07");
+                        queryPara.put("appId","abc");
+                        queryPara.put("batchNo",batchNo);
+                        jsonPath = kdsService.confirmOrder(queryPara,"",0);
+                        break;
+                    }else {
+                        //KDS 确认加工列表
+                        queryPara.clear();
+                        queryPara.put("shopId","9I07");
+                        queryPara.put("appId","abc");
+                        queryPara.put("batchNo",batchNo);
+                        jsonPath = kdsService.confirmOrder(queryPara,"",0);
+                    }
                 }
             }
-            Assert.isTrue(checkOrderResult,"未找到需要加工的订单");
-
-            //KDS 确认加工列表
-            queryPara.clear();
-            queryPara.put("shopId","9I07");
-            queryPara.put("appId","abc");
-            queryPara.put("batchNo",batchNo);
-            jsonPath = kdsService.confirmOrder(queryPara,"",0);
+            Assert.isTrue(checkOrderResult, "获取指定加工单成功");
 
             //KDS 开始、完成加工菜品, 用户自提
             for(Iterator iter = pickItemIds.iterator(); iter.hasNext();){
@@ -120,10 +137,40 @@ public class Yh_30 extends BaseTestCase {
                 queryPara.put("weightG","500");
                 jsonPath = kdsService.weighing(queryPara,"",0);
                 queryPara.remove("weightG");
+
+                //kds 开始加工
                 jsonPath = kdsService.beginProcessOrder(queryPara,"",0);
+
+                //校验订单待加工状态
+                TimeUnit.SECONDS.sleep(5);
+                query = "?uid=" + uid + "&channel=qa3&deviceid=000000000000000&platform=Android&v=4.2.2.1&access_token="
+                        + accessTokenSH+"&timestamp="+System.currentTimeMillis() + "&orderid=" + orderId;
+                jsonPath = orderService.detail(query,0);
+                status = jsonPath.getInt("status");
+                Assert.isTrue(status == SHOrderStatus.STARTPROCESS.getIndex(), "堂食商品加工完成后订单状态不是待加工状态");
+
+                //kds 完成加工
                 jsonPath = kdsService.finishProcessOrder(queryPara,"",0);
+
+                //校验订单待自提状态
+                TimeUnit.SECONDS.sleep(5);
+                query = "?uid=" + uid + "&channel=qa3&deviceid=000000000000000&platform=Android&v=4.2.2.1&access_token="
+                        + accessTokenSH+"&timestamp="+System.currentTimeMillis() + "&orderid=" + orderId;
+                jsonPath = orderService.detail(query,0);
+                status = jsonPath.getInt("status");
+                Assert.isTrue(status == SHOrderStatus.FINISHPROCESS.getIndex(), "堂食商品加工完成后订单状态不是待取餐状态");
+
+                //kds 完成加工
                 queryPara.put("pickupCode",pickupCode.substring(1,pickupCode.length()-1));
                 jsonPath = kdsService.pickUpOrder(queryPara,"",0);
+
+                //校验订单已完成状态
+                TimeUnit.SECONDS.sleep(5);
+                query = "?uid=" + uid + "&channel=qa3&deviceid=000000000000000&platform=Android&v=4.2.2.1&access_token="
+                        + accessTokenSH+"&timestamp="+System.currentTimeMillis() + "&orderid=" + orderId;
+                jsonPath = orderService.detail(query,0);
+                status = jsonPath.getInt("status");
+                Assert.isTrue(status == SHOrderStatus.FINISH.getIndex(), "堂食商品加工完成后订单状态不是已完成状态");
             }
 
 
@@ -135,19 +182,18 @@ public class Yh_30 extends BaseTestCase {
             accessTokenSH = userInfo.getAccess_token();
 
             // 积分校验
-            //TODO 待确认
-            //List<OrderDetail> goodsArr = new ArrayList<OrderDetail>();
-            //goodsArr.add(new OrderDetail(1d, 87.22d));
-            //Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
-            //System.out.println(tempCredit + "**" + credit);
-            //Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
+            List<OrderDetail> goodsArr = new ArrayList<OrderDetail>();
+            goodsArr.add(new OrderDetail(1d, 87.22d));
+            Double tempCredit = ValidateUtil.calculateCredit2(goodsArr);
+            System.out.println(tempCredit + "**" + credit);
+            Assert.isTrue(userInfo.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
 
             // 登出永辉生活app
             query = "?platform=Android&access_token=" + accessTokenSH;
             jsonPath = loginService.loginOutSH(query, 0);
 
         } catch (Exception e) {
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         } finally {

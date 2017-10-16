@@ -74,7 +74,7 @@ public class Yh_1 extends BaseTestCase {
 
 		try {
 			// 设置case名称
-			testcase.setTestName("会员店非合伙人当日达自提单履单");
+			testcase.setTestName("会员店非合伙人当日达配送单履单");
 
 			// case开始执行
 			// 登录永辉生活app
@@ -196,7 +196,7 @@ public class Yh_1 extends BaseTestCase {
 			jsonPath = loginService.loginOutSH(query, 0);
 
 		} catch (Exception e) {
-			testcase.setStatus("FAIL");
+			testcase.setStatus("FAILURE");
 			testcase.setDescription(e.getMessage());
 			throw e;
 		} finally {

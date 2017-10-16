@@ -201,6 +201,8 @@ public class Yh_18 extends BaseTestCase {
 					+ "&timestamp=" + System.currentTimeMillis() + "&platform=ios&channel=qa3";
 			body = "{\"waveId\": \"" + mergedWaveId + "\"}";
 			jsonPath = orderService.completePack(query, body, 0);
+			
+			Thread.sleep(5000);
 
 			// 调用管家的订单详情接口获取订单状态
 			for (String orderId : orderIds) {
@@ -216,13 +218,13 @@ public class Yh_18 extends BaseTestCase {
 			body = "{\"pwd\": \"" + password + "\", \"username\": \"" + zpsy + "\"}";
 			jsonPath = loginService.loginGJ(query, body, 0);
 			accessTokenGJ = jsonPath.getString("token");
-
+			
 			// 更新位置信息，使得此账号的配送员被派单
 			query = "?platform=ios&channel=qa3&access_token=" + accessTokenGJ + "&timestamp="
 					+ System.currentTimeMillis() + "&longitude=" + lng + "&latitude=" + lat + "";
 			jsonPath = userService.location(query, 0);
-
-			Thread.sleep(60000 * 2);
+			
+			Thread.sleep(60000 * 4);
 
 			// 根据订单号获取批次号
 			batchIds = orderDao.getBatchIdsByOrderIds(orderIds);
@@ -288,7 +290,7 @@ public class Yh_18 extends BaseTestCase {
 			jsonPath = loginService.loginOutSH(query, 0);
 
 		} catch (Exception e) {
-			testcase.setStatus("FAIL");
+			testcase.setStatus("FAILURE");
 			testcase.setDescription(e.getMessage());
 			throw e;
 		} finally {

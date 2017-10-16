@@ -242,7 +242,7 @@ public class Yh_14 extends BaseTestCase {
             jsonPath = loginService.loginOutSH(query, 0);
 
         } catch (Exception e) {
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         } finally {

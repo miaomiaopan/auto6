@@ -143,7 +143,7 @@ public class Yh_29 extends BaseTestCase {
             Assert.isTrue(userInfoNew.getBalance() == balance, "退款后用户余额增加数额错误");
 
         } catch (Exception e) {
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         } finally {

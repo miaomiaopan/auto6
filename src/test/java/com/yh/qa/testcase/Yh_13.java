@@ -223,7 +223,7 @@ public class Yh_13 extends BaseTestCase {
 
 
         } catch (Exception e) {
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         } finally {

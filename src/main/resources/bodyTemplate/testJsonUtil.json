@@ -1,0 +1,26 @@
+{
+  "order_sn":"14031000273822",
+  "carriers_code":1100000357,
+  "carrier":"浙江派尔快递",
+  "package_type":2,
+  "packages":[
+    {
+      "package":{
+        "good_sn":"ALM2236W36",
+        "amount":"2"
+      },
+      "package":{
+        "good_sn":"ALM2236W37",
+        "amount":"2"
+      },
+      "transport_no":"test5715A"
+    },
+    {
+      "package":{
+        "good_sn":"ALM2236W35",
+        "amount":"2"
+      },
+      "transport_no":"test5715B"
+    }
+  ]
+}

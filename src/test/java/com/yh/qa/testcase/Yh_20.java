@@ -200,7 +200,7 @@ public class Yh_20 extends BaseTestCase {
             Assert.isTrue(userInfoNew.getCredit() - tempCredit == credit, "核销后用户积分增加不正确");
 
         } catch (Exception e) {
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         } finally {

@@ -279,7 +279,7 @@ public class Yh_8 extends BaseTestCase {
             accessTokenSH = userInfo.getAccess_token();
             Assert.isTrue(userInfo.getToComment() - 1 == toComment, "核销后待评价订单总数没有加1");
         }catch (Exception e){
-            testcase.setStatus("FAIL");
+            testcase.setStatus("FAILURE");
             testcase.setDescription(e.getMessage());
             throw e;
         }
